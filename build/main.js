@@ -81,11 +81,11 @@ var DetailPage = /** @class */ (function () {
     DetailPage.prototype.ngOnInit = function () {
         //called after the constructor and called  after the first ngOnChanges() 
         this.itemTurn = this.fds.actualItemTurn;
-        if (this.itemTurn.event === 'I') {
-            this.actualComponent = '2'; //Chats
+        if (this.itemTurn.event === 'Q') {
+            this.actualComponent = '1'; //Items
         }
         else {
-            this.actualComponent = '1'; //Items
+            this.actualComponent = '2'; //Chats
         }
     };
     DetailPage.prototype.showDetaComponent = function (i) {
@@ -321,6 +321,10 @@ var HomePage = /** @class */ (function () {
                     _this.TurnEventSubsc = _this.fds.addTurnObservable().subscribe(function (aList) {
                         _this.turnList = [];
                         _this.turnList = aList;
+                        //ordenar
+                        _this.turnList.sort(function (a, b) {
+                            return a.stat - b.stat;
+                        });
                         for (var i = 0; i < _this.turnList.length; i++) {
                             _this.onchangeEventTurn(i);
                         }
@@ -478,7 +482,8 @@ var HomePage = /** @class */ (function () {
     };
     HomePage.prototype.onStateOfTurn = function (turnItem) {
         if (turnItem.status == 'S' || turnItem.status == 'K') {
-            return turnItem.assignedTurn + ' | Pos: ' + turnItem.pos + ' | ' + turnItem.stat + ' min';
+            var s = turnItem.assignedTurn.substr(0, 10) + ' | Pos: ' + turnItem.pos + ' | ' + turnItem.stat + ' min';
+            return s;
         }
         else if (turnItem.status == 'C' || turnItem.status == 'A') {
             return turnItem.window_title;
@@ -507,7 +512,7 @@ var HomePage = /** @class */ (function () {
     };
     HomePage = HomePage_1 = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-home',template:/*ion-inline-start:"I:\Proyectos\turnero\ionic\takitCli003\src\pages\home\home.html"*/'<ion-header>\n  <ion-toolbar color="primary">\n    <h2 class="tiket">Tiket</h2>\n    <ion-title>\n      <img src="/assets/imgs/add.png" class="logo" (click)="showQScanner($event)">\n    </ion-title>     \n    <ion-buttons end>\n      <button ion-button class="cmargin" (click)="onOrder()">\n        <ion-icon color="warning" name="funnel"></ion-icon>\n      </button>\n      <button ion-button (click)="showMainMenu($event)">\n        <ion-icon slot="icon-only" name="more"></ion-icon>\n      </button>\n    </ion-buttons>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content padding>\n  <ion-list>\n    <ion-item-sliding *ngFor="let turn of turnList; let i = index">\n      <button ion-item (click)="onTapCard(turn)">\n        <ion-avatar item-start>\n          <img [src]="turn.server_downloadURL || null"/>\n        </ion-avatar>\n        <ion-label>\n          <h2>{{ turn.server_title }}</h2>\n          <h3>{{ onStateOfTurn(turn) }}</h3>\n          <p>{{ turn.status_string }}</p>\n        </ion-label>\n      </button>\n      <ion-item-options side="left">\n        <button ion-button (click)="onContinueEvent(turn)">\n          <ion-icon name="arrow-dropright"></ion-icon>\n        </button>   \n      </ion-item-options>\n      <ion-item-options side="right">\n        <button ion-button (click)="onPauseEvent(turn)">\n          <ion-icon name="pause"></ion-icon>\n        </button>\n        <button ion-button color="danger" (click)="onDeleteEvent(i)">\n          <ion-icon name="trash"></ion-icon>\n        </button>   \n      </ion-item-options>\n    </ion-item-sliding>\n  </ion-list>\n</ion-content>\n'/*ion-inline-end:"I:\Proyectos\turnero\ionic\takitCli003\src\pages\home\home.html"*/
+            selector: 'page-home',template:/*ion-inline-start:"I:\Proyectos\turnero\ionic\takitCli003\src\pages\home\home.html"*/'<ion-header>\n  <ion-toolbar color="primary">\n    Tiket\n    <ion-title>\n      <img src="/assets/imgs/add.png" class="logo" (click)="showQScanner($event)">\n    </ion-title>     \n    <ion-buttons end>\n      <!--<button ion-button round outline class="cmargin" (click)="onOrder()">\n        <ion-icon color="warning" name="funnel"></ion-icon>\n      </button> -->\n      <button ion-button (click)="showMainMenu($event)">\n        <ion-icon slot="icon-only" name="more"></ion-icon>\n      </button>\n    </ion-buttons>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content padding>\n  <ion-list>\n    <ion-item-sliding *ngFor="let turn of turnList; let i = index">\n      <button ion-item (click)="onTapCard(turn)">\n        <ion-avatar item-start>\n          <img [src]="turn.server_downloadURL || null"/>\n        </ion-avatar>\n        <ion-label>\n          <h2>{{ turn.server_title }}</h2>\n          <h3>{{ onStateOfTurn(turn) }}</h3>\n          <p>{{ turn.status_string }}</p>\n        </ion-label>\n      </button>\n      <ion-item-options side="left">\n        <button ion-button (click)="onContinueEvent(turn)">\n          <ion-icon name="arrow-dropright"></ion-icon>\n        </button>   \n      </ion-item-options>\n      <ion-item-options side="right">\n        <button ion-button (click)="onPauseEvent(turn)">\n          <ion-icon name="pause"></ion-icon>\n        </button>\n        <button ion-button color="danger" (click)="onDeleteEvent(i)">\n          <ion-icon name="trash"></ion-icon>\n        </button>   \n      </ion-item-options>\n    </ion-item-sliding>\n  </ion-list>\n</ion-content>\n'/*ion-inline-end:"I:\Proyectos\turnero\ionic\takitCli003\src\pages\home\home.html"*/
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */],
             __WEBPACK_IMPORTED_MODULE_4__providers_firebase_service_firebase_service__["a" /* FirebaseServiceProvider */],
@@ -892,8 +897,9 @@ var DetaChatComponent = /** @class */ (function () {
         this.windClient = this.fds.actualItemTurn.window_title;
         this.itemChatSubs = this.fds.addTurnChatObservable(this.fds.actualItemTurn.chatId)
             .subscribe(function (chatInfo) {
-            if (chatInfo.itemChatStream) {
-                _this.chats = JSON.parse(chatInfo.itemChatStream);
+            debugger;
+            if (chatInfo.stream) {
+                _this.chats = JSON.parse(chatInfo.stream);
                 setTimeout(function () {
                     if (_this.content._scroll) {
                         _this.content.scrollToBottom(0);
@@ -947,7 +953,7 @@ var DetaChatComponent = /** @class */ (function () {
     ], DetaChatComponent.prototype, "content", void 0);
     DetaChatComponent = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'deta-chat',template:/*ion-inline-start:"I:\Proyectos\turnero\ionic\takitCli003\src\components\deta-chat\deta-chat.html"*/'\n<ion-content #mycontent no-padding>\n  <div>\n\n      <span *ngFor="let chat of chats">\n          <ng-template [ngIf]="chat.origin === \'C\'" [ngIfElse]="clientarea">\n            <div class="chat-message message-right">\n              <span class="msg-date">{{chat.date | date:\'short\'}}</span>\n              <div class="msg-msg" [innerHTML]=chat.msg></div>\n            </div>\n          </ng-template>\n    \n          <ng-template #clientarea>\n            <div class="chat-message message-left">\n              <span class="msg-date">{{chat.date | date:\'short\'}}</span>\n              <div class="msg-msg" [innerHTML]=chat.msg></div>\n            </div>\n          </ng-template>\n        </span>\n        \n  </div>\n \n\n</ion-content>\n\n<ion-footer>\n  <ion-grid>\n    <ion-row>\n      <ion-col col-10>\n        <ion-input type="text" placeholder="Mensaje" [(ngModel)]="message" name="message"></ion-input>\n      </ion-col>\n      <ion-col col-1 (click)="showSecuritySel()">\n        <ion-icon name="person"></ion-icon>\n      </ion-col>\n      <ion-col col-1 (click)="sendMessage()">\n        <ion-icon name="send"></ion-icon>\n      </ion-col>\n    </ion-row>\n  </ion-grid>\n</ion-footer>'/*ion-inline-end:"I:\Proyectos\turnero\ionic\takitCli003\src\components\deta-chat\deta-chat.html"*/
+            selector: 'deta-chat',template:/*ion-inline-start:"I:\Proyectos\turnero\ionic\takitCli003\src\components\deta-chat\deta-chat.html"*/'\n<ion-content #mycontent no-padding>\n  <div>\n\n      <span *ngFor="let chat of chats">\n          <ng-template [ngIf]="chat.origin === \'C\'" [ngIfElse]="clientarea">\n            <div class="chat-message message-right">\n              <span class="msg-date">{{chat.date | date:\'short\'}}</span>\n              <div class="msg-msg" [innerHTML]=chat.msg></div>\n            </div>\n          </ng-template>\n    \n          <ng-template #clientarea>\n            <div class="chat-message message-left">\n              <span class="msg-date">{{chat.date | date:\'short\'}}</span>\n              <div class="msg-msg" [innerHTML]=chat.msg></div>\n            </div>\n          </ng-template>\n        </span>\n        \n  </div>\n \n\n</ion-content>\n\n<ion-footer>\n  <ion-grid>\n    <ion-row>\n      <ion-col col-2>\n          <button ion-button (click)="showSecuritySel()">\n            <ion-icon name="person"></ion-icon>\n          </button>\n        </ion-col>\n      <ion-col col-8>\n        <ion-input type="text" placeholder="Mensaje" [(ngModel)]="message" (keyup.enter)="sendMessage()" name="message">\n        </ion-input>\n      </ion-col>\n      <ion-col col-2>\n        <button ion-button outline (click)="sendMessage()">\n          <ion-icon name="send"></ion-icon>\n        </button>\n      </ion-col>\n    </ion-row>\n  </ion-grid>\n</ion-footer>'/*ion-inline-end:"I:\Proyectos\turnero\ionic\takitCli003\src\components\deta-chat\deta-chat.html"*/
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__providers_firebase_service_firebase_service__["a" /* FirebaseServiceProvider */], __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["a" /* AlertController */]])
     ], DetaChatComponent);
@@ -1001,11 +1007,16 @@ var DetaItemComponent = /** @class */ (function () {
         this.itemSubs = this.fds.addTurnItemObservable(this.fds.actualItemTurn.itemId).subscribe(function (chatList) {
             debugger;
             _this.windClient = _this.fds.actualItemTurn.window_title;
-            if (chatList.itemChatStream) {
-                _this.items = JSON.parse(chatList.itemChatStream);
-                _this.calculate();
-                _this.edited = false;
-                _this.alternateclass = 'values';
+            if (chatList.stream) {
+                try {
+                    _this.items = JSON.parse(chatList.stream);
+                    _this.calculate();
+                    _this.edited = false;
+                    _this.alternateclass = 'values';
+                }
+                catch (error) {
+                    console.log(error);
+                }
             }
         });
     };
@@ -1185,7 +1196,7 @@ var FirebaseServiceProvider = /** @class */ (function () {
     FirebaseServiceProvider.prototype.updateItemChat = function (myId, type, list) {
         debugger;
         var itemChat = {};
-        itemChat.itemChatStream = list;
+        itemChat.stream = list;
         this.afs.collection(type).doc(myId).ref.set(itemChat);
     };
     FirebaseServiceProvider.prototype.chatEvent = function (chats, msg) {

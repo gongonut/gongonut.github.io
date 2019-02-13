@@ -25809,7 +25809,12 @@ ion-footer {
 
 h3 {
   color: darkred;
-  font-size: 14px;
+  font-size: 14px !important;
+  word-wrap: break-word;
+}
+
+p {
+  font-size: 12px !important;
 }
 
 ion-title {
