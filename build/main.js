@@ -766,7 +766,7 @@ var AppModule = /** @class */ (function () {
                     ]
                 }),
                 __WEBPACK_IMPORTED_MODULE_7__angular_fire__["a" /* AngularFireModule */].initializeApp(__WEBPACK_IMPORTED_MODULE_8__environment__["a" /* firebaseConfig */]),
-                __WEBPACK_IMPORTED_MODULE_9__angular_fire_firestore__["b" /* AngularFirestoreModule */].enablePersistence(),
+                __WEBPACK_IMPORTED_MODULE_9__angular_fire_firestore__["b" /* AngularFirestoreModule */].enablePersistence({ experimentalTabSynchronization: true }),
                 __WEBPACK_IMPORTED_MODULE_11__ionic_storage__["a" /* IonicStorageModule */].forRoot(),
                 __WEBPACK_IMPORTED_MODULE_20__zxing_ngx_scanner__["b" /* ZXingScannerModule */].forRoot()
             ],
@@ -898,7 +898,7 @@ var DetaChatComponent = /** @class */ (function () {
         this.itemChatSubs = this.fds.addTurnChatObservable(this.fds.actualItemTurn.chatId)
             .subscribe(function (chatInfo) {
             debugger;
-            if (chatInfo.stream) {
+            if (chatInfo && chatInfo.stream) {
                 _this.chats = JSON.parse(chatInfo.stream);
                 setTimeout(function () {
                     if (_this.content._scroll) {
@@ -1130,9 +1130,9 @@ var FirebaseServiceProvider = /** @class */ (function () {
     //............................. TURNOS ..............................
     //............................. TURNOS ..............................
     //turnEventCollection : AngularFirestoreCollection<turn>;
-    FirebaseServiceProvider.prototype.getTurnInfo = function (turnInd) {
-        return this.afs.collection('events').doc(turnInd).ref.get();
-    };
+    /* getTurnInfo(turnInd:string){
+      return this.afs.collection('events').doc(turnInd).ref.get();
+    } */
     //Observamos la lista de eventos hacia el servidor
     FirebaseServiceProvider.prototype.addTurnObservable = function () {
         var _this = this;
@@ -1155,20 +1155,22 @@ var FirebaseServiceProvider = /** @class */ (function () {
     //................................ EVENTOS EVENTOS EVENTOS EVENTOS .....................................
     FirebaseServiceProvider.prototype.addEvent = function (myEvent) {
         myEvent.myId = this.afs.createId();
+        myEvent.date = Date.now();
         this.afs.collection('events').doc(myEvent.myId).ref.set(myEvent);
     };
     //Solicita agregarse a la lista de turnos. El evento inicia en 
     FirebaseServiceProvider.prototype.addTurnEvent = function (serverId, clientInfo) {
+        debugger;
         var myEvent = {};
         myEvent.event = 'N';
         myEvent.key_server = serverId;
-        myEvent.request_id = this.itemClient.id;
-        myEvent.request_downloadURL = this.itemClient.downloadURL || '_';
+        myEvent.request_id = this.itemClient.id || '...';
+        myEvent.request_downloadURL = this.itemClient.downloadURL || '...';
         myEvent.request_myId = this.itemClient.myId;
-        myEvent.request_title = this.itemClient.title;
-        myEvent.request_security = this.itemClient.security_level;
+        myEvent.request_title = this.itemClient.title || '...';
+        myEvent.request_security = this.itemClient.security_level || 0;
         //Información de saludo de acuerdo a nivel de seguridad
-        myEvent.key_turn = clientInfo;
+        myEvent.key_turn = clientInfo || '...';
         this.addEvent(myEvent);
     };
     ;
@@ -1177,13 +1179,10 @@ var FirebaseServiceProvider = /** @class */ (function () {
         myEvent.event = thisEvent; //S, P, cambio de nivel de seguridad 1 2 3, I mensaje
         myEvent.key_server = thisTurn.key_server;
         myEvent.key_turn = thisTurn.myId;
-        myEvent.request_title = msg; //Mensaje
+        myEvent.request_title = msg || '...'; //Mensaje
         myEvent.request_id = 'C'; //En caso de mensaje, si es C o es S
         this.addEvent(myEvent);
     };
-    //Productos seleccionados. Tal vez solo se necesiten estos eventos y el componente agrega o edita
-    FirebaseServiceProvider.prototype.addEdtiItemEvent = function () { };
-    FirebaseServiceProvider.prototype.deleteItemEvent = function () { };
     //................................... TURN CHAT ITEM ..............................
     //................................... TURN CHAT ITEM ..............................
     //................................... TURN CHAT ITEM ..............................  
